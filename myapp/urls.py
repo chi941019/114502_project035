@@ -1,7 +1,9 @@
 from django.urls import path
 from . import views
 
+
 urlpatterns = [
+    path('', views.index, name='home'),
     path('index.html', views.index, name='index'),
     # path('index.html', views.index, name='index')
     # 對,我也不知道有時換這個反而能跑,有時又不能跑    
@@ -14,7 +16,7 @@ urlpatterns = [
     path('charts.html', views.charts, name='charts'),
     path('500.html', views.error_500, name='500'),
     path('401.html', views.error_401, name='401'),
-    path('404.html', views.error_404, name='404'),
+    path('404.html', views.error_404, name='404')
 ]
 
 # 原本沒有這些路徑
