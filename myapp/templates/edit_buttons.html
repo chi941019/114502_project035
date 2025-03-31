@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>按鈕編輯</title>
+    <style>
+        #editor {
+            width: 400px;
+            height: 400px;
+            border: 1px solid #000;
+            position: relative;
+        }
+        .button {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: blue;
+            border-radius: 50%;
+            cursor: grab;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>編輯按鈕</h2>
+    <div id="editor">
+        <div class="button" id="btn1" style="left: 50px; top: 50px;"></div>
+    </div>
+    <button onclick="saveChanges()">儲存設定</button>
+
+    <script>
+        let button = document.getElementById("btn1");
+        let editor = document.getElementById("editor");
+
+        // 讓按鈕可以拖曳
+        button.onmousedown = function(event) {
+            event.preventDefault();
+            let shiftX = event.clientX - button.getBoundingClientRect().left;
+            let shiftY = event.clientY - button.getBoundingClientRect().top;
+
+            function moveAt(pageX, pageY) {
+                button.style.left = pageX - shiftX - editor.offsetLeft + 'px';
+                button.style.top = pageY - shiftY - editor.offsetTop + 'px';
+            }
+
+            function onMouseMove(event) {
+                moveAt(event.pageX, event.pageY);
+            }
+
+            document.addEventListener('mousemove', onMouseMove);
+
+            button.onmouseup = function() {
+                document.removeEventListener('mousemove', onMouseMove);
+                button.onmouseup = null;
+            };
+        };
+
+        button.ondragstart = function() {
+            return false;
+        };
+
+        // 送出變更到 API
+        function saveChanges() {
+            let newX = parseInt(button.style.left);
+            let newY = parseInt(button.style.top);
+            
+            fetch('/api/buttons/1/', {  // 假設是按鈕 ID 1
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    position_x: newX,
+                    position_y: newY
+                })
+            }).then(response => response.json())
+            .then(data => {
+                alert("儲存成功！");
+            }).catch(error => {
+                console.error("儲存錯誤", error);
+            });
+        }
+    </script>
+
+</body>
+</html>
